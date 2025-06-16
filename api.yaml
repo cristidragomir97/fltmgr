@@ -1,0 +1,170 @@
+openapi: 3.0.3
+info:
+  title: RoboCore Server API
+  version: 1.0.0
+paths:
+  /robots/:
+    get:
+      summary: List all robots
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Register new robot
+      responses:
+        '201': { description: Created }
+
+  /robots/{robot_id}:
+    get:
+      summary: Get robot configuration
+      parameters:
+        - in: path
+          name: robot_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+    put:
+      summary: Update robot configuration
+      parameters:
+        - in: path
+          name: robot_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+    delete:
+      summary: Delete robot configuration
+      parameters:
+        - in: path
+          name: robot_id
+          required: true
+          schema: { type: string }
+      responses:
+        '204': { description: Deleted }
+
+  /robots/{robot_id}/status:
+    get:
+      summary: Get current robot status
+      responses:
+        '200': { description: OK }
+
+  /fleet/:
+    get:
+      summary: List all robots with live + config state
+      responses:
+        '200': { description: OK }
+
+  /fleet/deploy:
+    post:
+      summary: Deploy selected components across fleet
+      responses:
+        '200': { description: Deployment triggered }
+
+  /fleet/deployments/{deployment_id}:
+    get:
+      summary: Get status of a deployment
+      parameters:
+        - in: path
+          name: deployment_id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: OK }
+
+  /fleet/stage:
+    post:
+      summary: Trigger robocore-cli stage
+      responses:
+        '200': { description: Staging triggered }
+
+  /fleet/sync:
+    post:
+      summary: Sync all agents and configs
+      responses:
+        '200': { description: Synced }
+
+  /introspect/{robot_id}/nodes:
+    get:
+      summary: List ROS 2 nodes
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/topics:
+    get:
+      summary: List ROS 2 topics
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/topics/{name}:
+    get:
+      summary: Get topic details
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/services:
+    get:
+      summary: List ROS 2 services
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/diagnostics:
+    get:
+      summary: Get diagnostics tree
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/watch:
+    get:
+      summary: Get current watch state
+      responses:
+        '200': { description: OK }
+    post:
+      summary: Add or remove watched topics
+      responses:
+        '200': { description: OK }
+
+  /introspect/{robot_id}/tf:
+    get:
+      summary: Get TF tree
+      responses:
+        '200': { description: OK }
+
+  /portainer/endpoints:
+    get:
+      summary: List Portainer endpoints
+      responses:
+        '200': { description: OK }
+
+  /portainer/containers/{endpoint_id}:
+    get:
+      summary: List containers on host
+      responses:
+        '200': { description: OK }
+
+  /portainer/containers/{id}/start:
+    post:
+      summary: Start container
+      responses:
+        '200': { description: Started }
+
+  /portainer/containers/{id}/stop:
+    post:
+      summary: Stop container
+      responses:
+        '200': { description: Stopped }
+
+  /portainer/containers/{id}/logs:
+    get:
+      summary: Get container logs
+      responses:
+        '200': { description: Logs }
+
+  /portainer/containers/{id}/stats:
+    get:
+      summary: Get container stats
+      responses:
+        '200': { description: Stats }
+
+components: {}
+servers:
+  - url: https://api.robocore.dev/api/v1
