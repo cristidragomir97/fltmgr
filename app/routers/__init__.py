@@ -8,5 +8,6 @@ apps = import_module('.apps', __name__)
 hosts = import_module('.hosts', __name__)
 deployments = import_module('.deployments', __name__)
 auth = import_module('.auth', __name__)
+notifications = import_module('.notifications', __name__)
 
-__all__ = ['robots', 'fleet', 'portainer', 'introspect', 'apps', 'hosts', 'deployments', 'auth']
+__all__ = ['robots', 'fleet', 'portainer', 'introspect', 'apps', 'hosts', 'deployments', 'auth', 'notifications']

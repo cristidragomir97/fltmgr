@@ -3,6 +3,8 @@ from sqlmodel import select
 from typing import List
 
 from app.database_models import Deployment, get_session
+from app.firebase_utils import send_push
+import os
 
 router = APIRouter()
 
@@ -21,6 +23,17 @@ def create_deployment(dep: Deployment):
         session.add(dep)
         session.commit()
         session.refresh(dep)
+
+        token = os.getenv("FIREBASE_TEST_TOKEN")
+        if token:
+            try:
+                send_push(
+                    title="Deployment Created",
+                    body=f"Deployment {dep.id} for robot {dep.robot_id}",
+                    token=token,
+                )
+            except Exception as e:
+                print(f"FCM error: {e}")
         return dep
 
 @router.get("/{dep_id}", response_model=Deployment)
