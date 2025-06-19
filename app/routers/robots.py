@@ -1,7 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
-from app.database_models import Robot, get_session
-from typing import List
+from app.database_models import Robot, HostEntry, get_session, ContainerInfo
+from typing import List, Dict
+import httpx
+from app.portainer_utils import PORTAINER_API, HEADERS
 
 router = APIRouter()
 
@@ -48,5 +50,34 @@ def delete_robot(robot_id: str):
         if not robot:
             raise HTTPException(status_code=404, detail="Robot not found")
         session.delete(robot)
-        session.commit()
-        return
+    session.commit()
+    return
+
+
+@router.get("/{robot_id}/containers", response_model=Dict[str, List[ContainerInfo]])
+def list_robot_containers(robot_id: str):
+    """Return containers across all hosts attached to the given robot."""
+    with get_session() as session:
+        robot = session.get(Robot, robot_id)
+        if not robot:
+            raise HTTPException(status_code=404, detail="Robot not found")
+        hosts = session.exec(select(HostEntry).where(HostEntry.robot_id == robot_id)).all()
+    results: Dict[str, List[ContainerInfo]] = {}
+    for host in hosts:
+        r = httpx.get(
+            f"{PORTAINER_API}/endpoints/{host.portainer_endpoint_id}/docker/containers/json",
+            headers=HEADERS,
+        )
+        if r.status_code >= 400:
+            raise HTTPException(status_code=r.status_code, detail=r.text)
+        results[host.id] = [
+            ContainerInfo(
+                id=c.get("Id"),
+                names=[n.lstrip("/") for n in c.get("Names", [])],
+                image=c.get("Image"),
+                state=c.get("State"),
+                status=c.get("Status"),
+            )
+            for c in r.json()
+        ]
+    return results
